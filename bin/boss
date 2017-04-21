@@ -79,12 +79,15 @@ end
 
 storage = Ruote::BOSSStorage.new(db_path, { :number => $pnum })
 
+$stderr.puts "This is the viewer" if $pnum == 0
 roles = []
 if $pnum == 1
+  $stderr.puts "This is the scheduler"
   roles = ["scheduler"]
 end
 
 if $pnum > 1
+  $stderr.puts "This is a worker"
   roles = ["worker"]
 end
 
