@@ -134,7 +134,7 @@ module Ruote
     #
     def launch(process_definition, fields={}, variables={}, root_stash=nil)
 
-      puts caller.select { |l|
+      puts "launching process from (stack trace):\n", caller.select { |l|
         ! (l.match(/test\/unit[\.\/]/) or l.match(/\/rspec-core-/))
       } if @context.logger.noisy
         #
