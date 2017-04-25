@@ -17,6 +17,7 @@ module Ruote
       @roles = options.fetch("roles", [])
 
       super(storage)
+      puts "BOSSWorker running with priority=#{@priority} and number=#{@number}"
 
     end
 
