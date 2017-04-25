@@ -1,3 +1,5 @@
+require 'ruote-amqp'
+
 class BOSSReceiver < Ruote::Amqp::Receiver
 
   #TODO: implement standard logger and error notifier instead of per process
@@ -10,7 +12,7 @@ class BOSSReceiver < Ruote::Amqp::Receiver
     if item['error'] && item['fei']
         act = "that a participant has errored"
       elsif item['fields'] && item['fei']
-        act = "to process workitem"
+        act = "to process workitem #{item['fei']['wfid']}"
       elsif item['process_definition'] || item['definition']
         act = "to launch"
       else
