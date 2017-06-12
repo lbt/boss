@@ -1,21 +1,27 @@
-source "http://rubygems.org"
-gem "boss"
-gem "rspec", :require => "spec" 
-gem "inifile"
-# To use local checkout: bundle config local.ruote-amqp /mer/mer/devel/mer-mint/boss-bundle/ruby-ruote-amqp
-gem "ruote-amqp", :git => "git://github.com/kennethkalmer/ruote-amqp.git", :branch => "master"
-gem "ruote-kit", :git => "git://github.com/kennethkalmer/ruote-kit.git", :branch => "master"
-gem "yajl-ruby", ">=1.3.0"
-gem "amqp"
-
+source "http://rubygems.org" do
+  gem "rspec", :require => "spec" 
+  gem "inifile"
+  gem "yajl-ruby", ">=1.3.0"
+end
 # That's it for our strict dependencies. However, we also want to
 # ensure we're using specific git versions from things further down the tree.
 
-# bundle config local.amqp /maemo/devel/BOSS/src/ruby-amqp
-#gem "amqp", :git => "git://github.com/MeeGoIntegration/amqp.git", :branch => "mer-0.9.7"
-# bundle config local.ruote /maemo/devel/BOSS/src/ruby-ruote
-gem "ruote", :git => "git://github.com/MeeGoIntegration/ruote.git", :ref => "86fe481a5"
+# To use local checkout: bundle config local.$GEMNAME /path/to/checkout
 
+# Specify refs to pin the git. Local checkouts will use the branch
 
-
-#bundle install --path=/srv/bossin1          
+if ENV["USE_GIT"]
+  gem "boss", :git => "https://github.com/MeeGoIntegration/boss.git", :branch => "master"
+  gem "ruote", :git => "https://github.com/MeeGoIntegration/ruote.git", :branch => "mint-master", :ref => "86fe481a5"
+  gem "ruote-amqp", :git => "https://github.com/MeeGoIntegration/ruote-amqp.git", :branch => "master"
+  gem "ruote-kit", :git => "https://github.com/MeeGoIntegration/ruote-kit.git", :branch => "master"
+  gem "amqp", :git => "https://github.com/MeeGoIntegration/amqp.git", :branch => "mer-0.9.7"
+else
+  source "file:///srv/boss/boss/gemrepo/" do
+    gem "boss"
+    gem "ruote"
+    gem "ruote-amqp"
+    gem "ruote-kit"
+    gem "amqp"
+  end
+end
