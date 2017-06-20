@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'boss'
-  s.version     = '0.9.2'
+  s.version     = '0.9.3'
   s.executables << 'boss'
   s.executables << 'boss_clean_processes'
   s.executables << 'boss_check_pdef'
@@ -13,6 +13,8 @@ Gem::Specification.new do |s|
                    "lib/boss/boss_registrar.rb",
                    "lib/boss/boss_store.rb",
                    "lib/boss/boss_viewer.rb",
+                   "lib/boss/boss_worker.rb",
+                   "lib/boss/config.rb",
                   ]
   s.homepage    =
     'http://wiki.merproject.org/'
