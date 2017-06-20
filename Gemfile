@@ -1,15 +1,14 @@
-source "http://rubygems.org"
-gem "ruote-amqp", :git => "git://github.com/kennethkalmer/ruote-amqp.git", :branch => "master"
-gem "ruote-kit", :git => "git://github.com/kennethkalmer/ruote-kit.git", :branch => "master"
-gem "ruote", :git => "git://github.com/MeeGoIntegration/ruote.git", :ref => "86fe481a5"
+source "http://rubygems.org" do
+  gem "ruote-amqp", :git => "git://github.com/kennethkalmer/ruote-amqp.git", :branch => "master"
+  gem "ruote-kit", :git => "git://github.com/kennethkalmer/ruote-kit.git", :branch => "master"
+  gem "ruote", :git => "git://github.com/MeeGoIntegration/ruote.git", :ref => "86fe481a5"
 
 
-#source "http://rubygems.org" do
   gem "rspec", :require => "spec" 
   gem "inifile"
   gem "yajl-ruby", ">=1.3.0"
   gem "amqp"
-#end
+end
 # That's it for our strict dependencies. However, we also want to
 # ensure we're using specific git versions from things further down the tree.
 
@@ -20,12 +19,7 @@ gem "ruote", :git => "git://github.com/MeeGoIntegration/ruote.git", :ref => "86f
 
 # bundle config local.ruote /maemo/devel/BOSS/src/ruby-ruote
 # bundle config local.ruote-amqp /mer/mer/devel/mer-mint/boss-bundle/ruby-ruote-amqp
-# source "http://rubygems.org" do
-  if ENV["BOSS_SRC"]
-    gem "boss", :path => ENV["BOSS_SRC"]
-  else
-    gem "boss"
-  end
+source "http://rubygems.org" do
   if ENV["BOSS_RUOTE_SRC"]
     gem "ruote", :path => ENV["BOSS_RUOTE_SRC"]
   else
@@ -41,6 +35,14 @@ gem "ruote", :git => "git://github.com/MeeGoIntegration/ruote.git", :ref => "86f
   else
     gem "ruote-kit", :git => "git://github.com/kennethkalmer/ruote-kit.git", :branch => "master"
   end
-#end
+end
+
+if ENV["BOSS_SRC"]
+  gem "boss", :path => ENV["BOSS_SRC"]
+else
+  source "file:///srv/boss/boss/gemrepo/" do
+    gem "boss"
+  end
+end
 
 #bundle install --path=/srv/bossin1          
