@@ -8,14 +8,16 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["Kenneth Kalmer", "John Mettraux"]
-  s.date = "2017-04-10"
+  s.date = "2017-06-20"
   s.description = "\nAMQP participant/receiver pair for ruote\n  "
   s.email = ["kenneth.kalmer@gmail.com", "jmettraux@gmail.com"]
   s.files = ["CHANGELOG.txt", "CREDITS.txt", "LICENSE.txt", "README.md", "Rakefile", "TODO.txt", "lib/ruote-amqp.rb", "lib/ruote/amqp.rb", "lib/ruote/amqp/alert_participant.rb", "lib/ruote/amqp/participant.rb", "lib/ruote/amqp/receiver.rb", "lib/ruote/amqp/version.rb", "ruote-amqp.gemspec", "spec/alert_participant_spec.rb", "spec/participant_spec.rb", "spec/participant_subclass_spec.rb", "spec/receiver_spec.rb", "spec/spec_helper.rb", "spec/support/ruote_amqp_helper.rb"]
   s.homepage = "http://ruote.rubyforge.org"
   s.rubyforge_project = "ruote"
-  s.rubygems_version = "2.2.2"
+  s.rubygems_version = "2.2.5"
   s.summary = "AMQP participant/receiver pair for ruote"
+
+  s.installed_by_version = "2.2.5" if s.respond_to? :installed_by_version
 
   if s.respond_to? :specification_version then
     s.specification_version = 4
