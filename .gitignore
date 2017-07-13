@@ -10,3 +10,5 @@ play
 .bundle
 boss-bundle
 vendor/bundle
+gem/
+gemrepo/
