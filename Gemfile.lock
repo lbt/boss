@@ -1,7 +1,7 @@
 GIT
   remote: git://github.com/MeeGoIntegration/ruote.git
-  revision: 86fe481a50bbd1012c9c96295e5f3432d1fc5fbd
-  ref: 86fe481a5
+  revision: f3c2aeb685b2ce825245f1eb8f43e0e708ff4976
+  ref: f3c2aeb68
   specs:
     ruote (2.3.1)
       blankslate (= 2.1.2.4)
@@ -51,7 +51,7 @@ GEM
     blankslate (2.1.2.4)
     boss (0.9.3)
     diff-lcs (1.3)
-    et-orbi (1.0.4)
+    et-orbi (1.0.5)
       tzinfo
     eventmachine (0.12.10)
     file-tail (1.2.0)
@@ -107,7 +107,7 @@ GEM
     temple (0.8.0)
     thread_safe (0.3.6)
     tilt (2.0.7)
-    tins (1.14.0)
+    tins (1.15.0)
     tzinfo (1.2.3)
       thread_safe (~> 0.1)
     yajl-ruby (1.3.0)

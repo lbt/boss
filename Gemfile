@@ -1,7 +1,7 @@
 source "http://rubygems.org" do
-  gem "ruote-amqp", :git => "git://github.com/kennethkalmer/ruote-amqp.git", :branch => "master"
-  gem "ruote-kit", :git => "git://github.com/kennethkalmer/ruote-kit.git", :branch => "master"
-  gem "ruote", :git => "git://github.com/MeeGoIntegration/ruote.git", :ref => "86fe481a5"
+#  gem "ruote-amqp", :git => "git://github.com/kennethkalmer/ruote-amqp.git", :branch => "master"
+#  gem "ruote-kit", :git => "git://github.com/kennethkalmer/ruote-kit.git", :branch => "master"
+#  gem "ruote", :git => "git://github.com/MeeGoIntegration/ruote.git", :ref => "86fe481a5"
 
 
   gem "rspec", :require => "spec" 
@@ -23,7 +23,8 @@ source "http://rubygems.org" do
   if ENV["BOSS_RUOTE_SRC"]
     gem "ruote", :path => ENV["BOSS_RUOTE_SRC"]
   else
-    gem "ruote", :git => "git://github.com/MeeGoIntegration/ruote.git", :ref => "86fe481a5"
+    #gem "ruote", :git => "git://github.com/MeeGoIntegration/ruote.git", :ref => "86fe481a5"
+    gem "ruote", :git => "git://github.com/MeeGoIntegration/ruote.git", :branch => "mint-master"
   end
   if ENV["BOSS_RUOTE_AMQP_SRC"]
     gem "ruote-amqp", :path => ENV["BOSS_RUOTE_AMQP_SRC"]
