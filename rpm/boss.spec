@@ -9,7 +9,7 @@ Requires: rabbitmq-server >= 1.7.2, python-boss-skynet > 0.6.0
 Obsoletes: boss-bundle
 BuildRequires:  rubygems ruby-devel
 %rubygems_requires
-BuildRequires:  rubygem(bundler) git gcc-c++ openssl-devel pkg-config
+BuildRequires:  rubygem(bundler) >= 1.15.0 git gcc-c++ openssl-devel pkg-config
 
 %description
 The BOSS package configures the servers used to connect BOSS participants.
