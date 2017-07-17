@@ -10,7 +10,13 @@ end
 
 # Specify refs to pin the git. Local checkouts will use the branch
 
-if ENV["USE_GEMS"]
+if ENV["USE_GIT"]
+  gem "boss", :git => "https://github.com/MeeGoIntegration/boss.git", :branch => "master"
+  gem "ruote", :git => "https://github.com/MeeGoIntegration/ruote.git", :branch => "mint-master", :ref => "86fe481a5"
+  gem "ruote-amqp", :git => "https://github.com/MeeGoIntegration/ruote-amqp.git", :branch => "master"
+  gem "ruote-kit", :git => "https://github.com/MeeGoIntegration/ruote-kit.git", :branch => "master"
+  gem "amqp", :git => "https://github.com/MeeGoIntegration/amqp.git", :branch => "mer-0.9.7"
+else
   source "file:///srv/boss/boss/gemrepo/" do
     gem "boss"
     gem "ruote"
@@ -18,10 +24,4 @@ if ENV["USE_GEMS"]
     gem "ruote-kit"
     gem "amqp"
   end
-else
-  gem "boss", :git => "https://github.com/MeeGoIntegration/boss.git", :branch => "master"
-  gem "ruote", :git => "https://github.com/MeeGoIntegration/ruote.git", :branch => "mint-master", :ref => "86fe481a5"
-  gem "ruote-amqp", :git => "https://github.com/MeeGoIntegration/ruote-amqp.git", :branch => "master"
-  gem "ruote-kit", :git => "https://github.com/MeeGoIntegration/ruote-kit.git", :branch => "master"
-  gem "amqp", :git => "https://github.com/MeeGoIntegration/amqp.git", :branch => "mer-0.9.7"
 end
