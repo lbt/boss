@@ -1,0 +1,40 @@
+FROM opensuse:42.2
+MAINTAINER David Greaves <david.greaves@jolla.com>
+
+# The purpose of this docker image is to gather both the rubygem.org
+# gems and any git-based gems used in the OBS boss-bundle package.
+# This lets us include local modifications to (typically git-based)
+# gems and update (if specified in the Gemfile) to newer upstream gem
+# releases (eg for security!)
+
+RUN mkdir -p /srv
+WORKDIR /srv
+
+RUN zypper --non-interactive ref
+RUN zypper --non-interactive in gcc-c++ \
+    git \
+    make \
+    openssl-devel \
+    pkg-config \
+    rubygems \
+    ruby-devel \
+    tar
+
+# We need to install bundler for 42 from mint in OBS
+RUN zypper ar http://repo.merproject.org/obs/mint:/devel/openSUSE_42.2/mint:devel.repo
+RUN zypper --non-interactive in ruby2.1-rubygem-bundler
+
+RUN gem install builder
+
+RUN groupadd --gid 500 boss && useradd boss --uid 500 --gid boss --home-dir /srv/boss --create-home --shell /bin/bash
+
+CMD ["/bin/bash"]
+#CMD ["/bin/bash", "-e", "cp -a /srv/boss/osc/. /srv/boss/tmp/."]
+
+
+
+# Build in the bossdev directory as:
+# docker build -t boss-base -f Dockerfile-boss-base .
+#
+# Run as:
+# docker run -i -v /mer/mer/devel/mer-mint/bossdev/:/srv/boss -t boss-base

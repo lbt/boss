@@ -1,0 +1,45 @@
+#!/bin/bash -x
+
+# This file should be run inside the Docker instance created by the
+# Dockerfile-boss-base file.
+GEMS="boss amqp ruote ruote-amqp ruote-kit"
+BUNDLE=/usr/bin/bundle.ruby2.1
+
+# This is where the boss source resides
+DEVSRC=/srv/boss/boss
+cd ${DEVSRC}
+rm -rf gemrepo
+mkdir -p gemrepo/gems
+
+# Build all the gems:
+for gem in ${GEMS}; do
+    cd ../$gem
+    # Build the gem in the src/ dir.
+    gem build $gem.gemspec
+    # Copy it to a filesytem "gem server"
+    mv *.gem ${DEVSRC}/gemrepo/gems
+done
+
+# Build the gem repo
+cd ${DEVSRC}
+(cd gemrepo && gem generate_index -d ${DEVSRC}/gemrepo)
+
+# Now download and update the gems and git repos into the container to
+# allow them to be installed:
+
+# Mark this as a gem build but don't do the --binstubs thing. That's
+# done by OBS build
+unset USE_GIT
+rm -rf boss-bundle Gemfile.lock
+for gem in ${GEMS}; do
+    rm vendor/cache/${gem}-[0-9]*gem
+done
+${BUNDLE} install --path=./boss-bundle --standalone  --shebang=/usr/bin/ruby
+${BUNDLE} update boss amqp ruote ruote-amqp ruote-kit
+# Now pack everything into vendor/cache (including the git checkouts)
+echo packaging bundle
+${BUNDLE} package --all
+# At this point ${DEVSRC}/vendor/cache has the snapshotted code in it
+echo "You can now checkin the changes; should just be the Gemfile.lock and the vendor/cache"
+
+

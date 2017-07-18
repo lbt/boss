@@ -1,0 +1,90 @@
+* Overview
+
+Boss is built in a single package now. The boss src, config and
+associated plugins with a bundle of gems are all contained in a single
+git repository.
+
+Since the OBS has no network capability, the gem dependencies need to
+be pulled together and uploaded to the OBS to be packaged into the rpm
+containing the Boss bundle.
+
+* Setting up development area
+
+** Directory layout
+
+ To allow iterative development and testing using the checked-out git
+ source it helps to have a directory which contains checkouts of the
+ relevant git repos:
+
+  * boss
+  * amqp
+  * ruote
+  * ruote-amqp
+  * ruote-kit
+
+ This could be called bossdev/ and is referred to as BOSS_SRC below
+
+* Building BOSS and the Gem dependencies
+
+To ensure a consistent ruby development environment (and to form the
+basis of a local runtime/test environment) a docker image is used to
+assemble and prepare the gems.  The working directory is mapped to the
+boss src directory to allow updates to the gems and Gemfile.lock to be
+managed in git.
+
+Note: The Dockerfile-boss-base uses uid/gid 500/500 for the boss user.
+You should pick the uid/gid that maps to your login user to ensure
+that data written to the mounted volumes has the correct ownership.
+
+To set it up run the following commands:
+ docker pull opensuse@sha256:dbe1bc006881ae5467006561ec8746145d628bf494c7a578adead356d085b88a
+ docker build -t boss_builder -f Dockerfile-boss-base .
+
+To build the boss gems (subject to Gemfile constraints) use the build_gems script:
+ BOSS_SRC=/mer/mer/devel/mer-mint/bossdev
+ docker run -v $BOSS_SRC:/srv/boss -v /sys/fs/cgroup:/sys/fs/cgroup:ro  -v /tmp/$(mktemp -d):/run -t boss-base su boss /srv/boss/boss/dev/build_gems
+
+* Install and test in Docker
+
+To install and test the gems we need to build a runnable docker instance:
+ docker build -t boss-run -f Dockerfile-boss-run .
+
+** The Boss runtime Docker
+
+The boss-run docker is systemd driven and has an AMQP server and
+supervisor running inside it. As such an interactive shell should be
+attached to the running session.
+
+*** Starting the docker session
+    Run:
+     docker run -d -v $BOSS_SRC:/srv/boss -v /sys/fs/cgroup:/sys/fs/cgroup:ro  -v /tmp/$(mktemp -d):/run -t boss-run; DNAME=$(docker ps --format "{{.Image}}:{{.Names}}" | grep boss-run| cut -f2 -d:); echo Running as $DNAME
+
+     This will continue to run in the background. Removing the -d option will allow it to run in the foreground (although you won't see any useful output).
+
+*** Attach a session to setup AMQP
+
+    Run:
+      docker exec -it $DNAME /srv/boss/boss/dev/setup_rabbit
+
+*** Attach a session to run boss based on the gems that will be used in production
+     Now attach a bash session:
+       docker exec -it $DNAME /bin/bash
+
+     In that session (as root):
+
+       /srv/boss/boss/dev/install_boss gems
+       /srv/boss/boss/dev/run_boss
+
+     The Boss viewer is now available on your Docker instance at port
+     9292 and Rabbit interface on 
+
+*** Attach a session to run boss based on the checked out git
+
+     Now attach a bash session:
+       docker exec -it $DNAME /bin/bash
+
+     In that session (as root):
+
+       /srv/boss/boss/dev/install_boss git
+       /srv/boss/boss/dev/run_boss git
+

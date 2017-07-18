@@ -1,0 +1,6 @@
+#!/bin/bash
+cd /usr/lib/boss-bundle
+if [[ $1 == "git" ]]; then
+    export USE_GIT=1
+fi
+su boss -c "bundle exec boss /srv/boss/boss/dev/boss.conf"

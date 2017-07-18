@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# This file should be run inside the Docker instance created by the
+# Dockerfile-boss-run file.
+
+BUNDLE=/usr/bin/bundle.ruby2.1
+
+DEVSRC=/srv/boss/boss
+BUILD_DIR=${DEVSRC}
+
+# To install:
+INSTALL_DIR=/usr/lib/boss-bundle
+rm -rf ${INSTALL_DIR}
+mkdir -p ${INSTALL_DIR}/vendor
+cd ${INSTALL_DIR}
+cp ${DEVSRC}/Gemfile ${DEVSRC}/Gemfile.lock ${INSTALL_DIR}
+cp -a ${DEVSRC}/vendor/cache ${INSTALL_DIR}/vendor
+mkdir /var/spool/boss
+chown -R boss ${INSTALL_DIR} /var/spool/boss
+echo installing bundle
+if [[ $1 == "git" ]] ; then
+    su boss -c "${BUNDLE} config local.boss /srv/boss/boss"
+    su boss -c "${BUNDLE} config local.ruote /srv/boss/ruote"
+    su boss -c "${BUNDLE} config local.ruote-amqp /srv/boss/ruote-amqp"
+    su boss -c "${BUNDLE} config local.ruote-kit /srv/boss/ruote-kit"
+    su boss -c "${BUNDLE} config local.amqp /srv/boss/amqp"
+    su boss -c "export USE_GIT=1; ${BUNDLE} install --local --standalone --no-deployment --binstubs=bin --no-cache --shebang=/usr/bin/ruby"
+elif [[ $1 == "gems" ]] ; then
+    su boss -c "${BUNDLE} install --local --standalone --deployment --binstubs=bin --no-cache --shebang=/usr/bin/ruby"
+else
+    echo "Not installed - only '$0 gems' and '$0 git' are known"
+fi

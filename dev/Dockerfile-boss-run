@@ -1,0 +1,49 @@
+FROM boss-base
+MAINTAINER David Greaves <david.greaves@jolla.com>
+
+# The purpose of this docker image is to gather both the rubygem.org
+# gems and any git-based gems used in the OBS boss-bundle package.
+# This lets us include local modifications to (typically git-based)
+# gems and update (if specified in the Gemfile) to newer upstream gem
+# releases (eg for security!)
+
+# This is built against a local boss-base image which you must build and tag first.
+
+WORKDIR /srv
+
+RUN zypper --non-interactive in rabbitmq-server rabbitmq-server-plugins iproute2
+
+# https://github.com/openSUSE/docker-containers/blob/master/derived_images/systemd/Dockerfile
+# Minimise systemd services
+RUN (cd /usr/lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \
+    rm -f /usr/lib/systemd/system/multi-user.target.wants/*;\
+    rm -f /etc/systemd/system/*.wants/*;\
+    rm -f /usr/lib/systemd/system/local-fs.target.wants/*; \
+    rm -f /usr/lib/systemd/system/sockets.target.wants/*udev*; \
+    rm -f /usr/lib/systemd/system/sockets.target.wants/*initctl*; \
+    rm -f /usr/lib/systemd/system/basic.target.wants/*; \
+    rm -f /usr/lib/systemd/system/anaconda.target.wants/*; \
+    rm -f /usr/lib/systemd/system/sysinit.target.wants/sys-fs-fuse-connections.mount
+
+VOLUME [ "/sys/fs/cgroup" ]
+CMD ["/usr/lib/systemd/systemd", "--system"]
+#CMD ["/bin/bash", "-e", "cp -a /srv/boss/osc/. /srv/boss/tmp/."]
+
+
+
+# Rabbit needs to be running to do the rabbit plugin/user setup but
+# that needs to happen when systemd is running as init so can't happen
+# at build time :(
+
+
+# Note that for systemd to work you must have a /run on a tmpfs at the moment (odd but...)
+# BOSS_SRC is the checked out boss git repo
+# Run as:
+# BOSS_SRC=/mer/mer/devel/mer-mint/bossdev
+# docker run -i -v $BOSS_SRC:/srv/boss -v /sys/fs/cgroup:/sys/fs/cgroup:ro  -v /tmp/$(mktemp -d):/run -t boss-run
+#
+# Then access a shell with
+# docker exec -it boss-run /bin/bash
+# and
+# cd /srv/boss
+# ./config/setup_rabbit
