@@ -30,7 +30,7 @@ module Ruote
 
     def process_msgs
 
-      @msgs = @storage.get_msgs(1, @priority) if @msgs.empty?
+      @msgs = @storage.get_msgs(100, @priority) if @msgs.empty?
 
       while @msg = @msgs.pop
 
