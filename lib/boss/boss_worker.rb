@@ -15,8 +15,9 @@ module Ruote
       @priority = options.fetch("priority", "high")
       @number = options.fetch("number", 0)
       @roles = options.fetch("roles", [])
+      name = options.fetch("name", "worker")
 
-      super(storage)
+      super(name, storage)
       puts "BOSSWorker running with priority=#{@priority} and number=#{@number}"
 
     end
