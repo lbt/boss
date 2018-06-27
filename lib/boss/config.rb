@@ -3,11 +3,7 @@
 require 'rubygems'
 
 require 'amqp'
-require 'yajl'
 require 'ruote'
-require 'ruote/storage/fs_storage'
-require 'ruote-amqp'
-require 'ruote-kit'
 
 require 'pp'
 
