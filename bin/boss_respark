@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'bundler/setup'
+
+require 'ruote'
+require 'ruote/storage/fs_storage'
+
+require 'boss/boss_store'
+require 'boss/boss_worker'
+require 'boss/boss_viewer'
+require 'boss/boss_receiver'
+require 'boss/boss_registrar'
+
+STDOUT.sync = true
+STDERR.sync = true
+
+require 'inifile'
+if ARGV[0].nil?
+    $stderr.puts "No arguments provided. Please provide path to confiuration file."
+    exit 1
+end
+
+conf = IniFile.load("/etc/skynet/skynet.conf") || IniFile.new
+conf = conf.merge(IniFile.load(ARGV[0]))
+debug = (conf["boss"]["debug"] == true)
+
+storage = Ruote::BOSSStorage.new(db_path)
+$dashboard = Ruote::Dashboard.new(storage)
+$stderr.puts "Dashboard threads running"
+$dashboard.noisy = true
+
+#$dashboard.respark("20150604-1553-dukapade-hesayura")
+$dashboard.re_apply('0_14_0!512836bacaa6900aaa01b204fdf6b787!20150604-1553-dukapade-hesayura')
+$dashboard.join
+exit 0

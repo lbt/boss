@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require 'bundler/setup'
+
+require 'yajl'
+require 'ruote'
+require 'ruote/storage/fs_storage'
+
+dashboard = Ruote::Dashboard.new(
+    # Use boss.config
+    Ruote::FsStorage.new('/var/spool/boss/boss_ruote_db/')
+)
+
+good=0
+loop do
+  errors=dashboard.errors(:limit=>100, :skip=>good)
+  break if errors.length == 0
+  errors.each { |err|
+    puts "Consider #{err.wfid} / #{err.msg['participant_name']} from #{err})"
+    if err.msg['participant_name'] == ARGV[0]
+      puts "#{err.msg['participant_name']} was doing #{err.msg['action']}"
+      puts "Error #{err.message}"
+      puts "removing"
+      dashboard.remove_process(err.wfid)
+    else
+      good+=1
+    end
+  }
+  puts "looping"
+end

@@ -11,6 +11,13 @@ engine = Ruote::Engine.new(
     Ruote::FsStorage.new('/var/spool/boss/boss_ruote_db/')
 )
 
+if ARGV[0] == 'pid'
+  p = engine.process(ARGV[1])
+  puts "killing #{p.definition_name} : #{p.wfid}"
+  engine.kill( p.wfid )
+else
+  
+
 
 engine.process_ids.each { |pid|
   p = engine.process(pid)
@@ -22,3 +29,4 @@ engine.process_ids.each { |pid|
     engine.kill( p.wfid )
   end
 }
+end

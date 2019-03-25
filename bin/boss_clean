@@ -7,12 +7,14 @@ require 'boss/config'
 match={}
 older=nil
 dry=false
+just_errors=false
 
 BOSS.optionparser.banner = "Usage: example.rb [options]"
 BOSS.optionparser.on("--participant=NAME", "Regexp to match Participant name") { |p|  match["participant_name"]=Regexp.new(p) }
 BOSS.optionparser.on("--process==NAME", "Regexp to match process name (wi.wf_name)") { |p| match["wf_name"]=Regexp.new(p) }
-BOSS.optionparser.on("--older==DAYS", "Older than DAYS days") { |d| older=d.to_f }
+BOSS.optionparser.on("--older==DAYS", "Older than DAYS days (last active or error time)") { |d| older=d.to_f }
 BOSS.optionparser.on("--dry", "Dry run") { |d| dry||=d }
+BOSS.optionparser.on("--errors", "Only match errors") { just_errors=true }
 
 BOSS.setup
 
@@ -24,13 +26,21 @@ dashboard = Ruote::Dashboard.new(BOSS.storage)
 
 good=0
 loop do
-  errors=dashboard.errors(:limit=>100, :skip=>good)
-  break if errors.length == 0
-  errors.each { |err|
-    wi=err.workitem
-    puts "Consider #{err.wfid}  #{wi.to_h['wf_name']} @ #{wi.to_h['participant_name']}"
+  if just_errors
+    procs = dashboard.errors(:limit=>100, :skip=>good)
+  else
+    procs = dashboard.processes(:limit=>100, :skip=>good)
+  end
+  break if procs.length == 0
+  procs.each { |proc|
+    if just_errors
+      wi=proc.workitem
+    else
+      wi=proc.root_workitem
+    end
+    puts "Consider #{proc.wfid}  #{wi.to_h['wf_name']} @ #{wi.to_h['participant_name']}"
     m=true
-    match.each { |key, re| 
+    match.each { |key, re|
       m &&= re =~ wi.to_h[key]
       if !m then
         p "didn't match #{re} =~ #{key}"
@@ -38,15 +48,24 @@ loop do
       end
     }
     if (m && older != nil) then
-      age_days=(Time.now - Time.parse(err.at))/(60*60*24)
+      if just_errors
+        at=proc.at
+      else
+        at=proc.last_active
+      end
+      age_days=(Time.now - Time.parse(at))/(60*60*24)
       p "check if age (#{age_days}) > #{older}"
       m &&= age_days > older
     end
     if m
-      puts "was doing #{err.msg['action']}"
-      puts "Error #{err.message}"
+      if just_errors
+        puts "was doing #{proc.msg['action']}"
+        puts "Error #{proc.message}"
+      else
+        puts proc.definition_name
+      end
       puts "removing"
-      dashboard.remove_process(err.wfid) if ! dry
+      dashboard.remove_process(proc.wfid) if ! dry
     else
       good+=1
     end

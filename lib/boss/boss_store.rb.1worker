@@ -19,7 +19,6 @@ module Ruote
     def initialize(dir, options={})
 
       @number = options.fetch("number", 0)
-      $stderr.puts "Storage #{@number}" if @number==1
       super(dir, options)
     end
 
@@ -52,21 +51,13 @@ module Ruote
 
     def get_msgs (limit, priority)
 
-      #msgs = get_many('msgs', priority, {:limit => limit, :noblock => true, :skip => limit * @number})
-      #msgs = get_many('msgs', nil, {:limit => limit, :noblock => true, :skip => limit * @number}) if msgs.empty? 
+#      msgs = get_many('msgs', priority, {:limit => limit, :noblock => true, :skip => limit * @number})
+#      msgs = get_many('msgs', nil, {:limit => limit, :noblock => true, :skip => limit * @number}) if msgs.empty? 
+      $stderr.puts "Getting #{limit} messages"
+      msgs = get_many('msgs', nil, {:limit => limit, :noblock => true})
+      $stderr.puts "Got #{msgs.length} messages"
+      msgs.sort_by { |d| d['put_at'] }
 
-      #if @number > 1
-      #  skip = (@number - 2)*limit
-      #else
-      #  skip = 0
-      #end
-      skip = 0
-      flip = @number % 2 == 0
-      $stderr.puts "Getting #{limit} messages from #{skip} (#{priority}) descending #{flip}"
-      msgs = get_many('msgs', nil, {:limit => limit, :noblock => true, :skip => skip, :descending => flip})
-      r = msgs.sort_by { |d| d['put_at'] }
-      $stderr.puts "Got #{r.length} messages"
-      r
     end
 
   end
@@ -81,7 +72,7 @@ module Ruote
       @priority = options.fetch("priority", "high")
       @number = options.fetch("number", 0)
       @roles = options.fetch("roles", [])
-      $stderr.puts "Initialise worker number #{@number} roles #{@roles} " if @number==1
+
       super(storage)
 
     end
@@ -94,17 +85,13 @@ module Ruote
 
     def process_msgs
 
-      $stderr.puts "Get messages #{@number} for roles #{@roles}" if @number==1
-      @msgs = @storage.get_msgs(20, @priority) if @msgs.empty?
-      if @msgs.length == 0
-         $stderr.puts "sleeping"
-         sleep(1)
-      end
-     
+      @msgs = @storage.get_msgs(100, @priority) if @msgs.empty?
 
       while @msg = @msgs.pop
 
           r = process(@msg)
+#          $stderr.puts "Processed #{@msg}"
+
 
           if r != false
             @processed_msgs += 1
@@ -112,24 +99,6 @@ module Ruote
 
           break if Time.now.utc - @last_time >= 0.8
 
-      end
-    end
-
-    def take_a_rest
-
-      return if @sleep_time == nil
-
-      if @processed_msgs < 1
-
-        @sleep_time += 0.01
-        @sleep_time = 1.0 if @sleep_time > 1.0
-
-        # $stderr.puts "Sleeping for #{@sleep_time}"
-        sleep(@sleep_time)
-
-      else
-
-        @sleep_time = nil
       end
     end
 
@@ -143,14 +112,12 @@ module Ruote
       determine_state
 
       if @state == 'stopped'
-        $stderr.puts "stopped" if @number==1
         return
       elsif @state == 'running'
         process_schedules if @roles.include? 'scheduler'
         process_msgs if @roles.include? 'worker'
       end
 
-#      $stderr.puts "Sleep #{@sleep_time}" if @number==2
       take_a_rest # 'running' or 'paused'
 
     rescue => err
