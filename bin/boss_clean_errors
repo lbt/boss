@@ -1,9 +1,10 @@
-#!/usr/bin/env ruby                                                                                                      
+#!/usr/bin/env ruby
 require 'rubygems'
 require 'bundler/setup'
 
 require 'boss/config'
 
+# Use boss.config
 $stderr.puts "Store is #{BOSS.storage}"
 dashboard = Ruote::Dashboard.new(BOSS.storage)
 
@@ -13,7 +14,7 @@ loop do
   errors.each { |err|
     age_days=(Time.now - Time.parse(err.at))/(60*60*24)
     puts "Consider #{err.wfid} from #{err}"
-    if age_days > 4 then
+    if age_days > 0 then
       puts "Error is from #{age_days} days ago : #{err.at}"
       puts "#{err.msg['participant_name']} was doing #{err.msg['action']}"
       puts "Error #{err.message}"
@@ -22,3 +23,15 @@ loop do
     end
   }
 end
+
+# engine.process_ids.each { |pid|
+#   p = engine.process(pid)
+#   puts "looking at #{p.definition_name}"
+#   if (ARGV[0] == p.definition_name or
+#       ARGV[0] == p.wfid or
+#       ARGV[0] == p.position) then
+#     puts "killing #{p.definition_name} : #{p.wfid}"
+#     engine.kill( p.wfid )
+#   end
+#     end
+    

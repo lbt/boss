@@ -3,11 +3,19 @@
 require 'rubygems'
 
 require 'amqp'
+require 'yajl'
 require 'ruote'
+require 'ruote/storage/fs_storage'
+require 'ruote-amqp'
+require 'ruote-kit'
 
 require 'pp'
 
 require 'boss/boss_store'
+require 'boss/boss_worker'
+require 'boss/boss_viewer'
+require 'boss/boss_receiver'
+require 'boss/boss_registrar'
 
 require 'inifile'
 
@@ -27,7 +35,7 @@ module BOSS
     $stderr.puts "No -c config file"
     raise OptionParser::MissingArgument
   end
-
+  
   conf = IniFile.load("/etc/skynet/skynet.conf") || IniFile.new
   conf = conf.merge(IniFile.load(@boss_config_file))
   debug = (conf["boss"]["debug"] == true)

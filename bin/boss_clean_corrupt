@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'bundler/setup'
+
+require 'ruote'
+require 'ruote/storage/fs_storage'
+require 'ruote/dashboard'
+require 'boss/boss_store'
+require 'boss/config'
+
+good=0
+
+$dashboard = Ruote::Dashboard.new(
+    # Use boss.config
+    BOSS.storage
+)
+
+loop do
+  processes = $dashboard.processes(:limit=>100, :skip=>good)
+  break if processes.length == 0
+  processes.each { |proc|
+    #    puts "Consider #{proc.wfid} / #{proc.definition_name} from #{proc.position})"
+    this_proc=$dashboard.process(proc.wfid)
+    next unless this_proc
+    if proc.root_expression == nil 
+      puts "Removing #{this_proc.wfid}"
+      $dashboard.remove_process(this_proc.wfid)
+    end
+    puts "."
+    good+=1
+  }
+  puts "looping"
+end

@@ -1,0 +1,62 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'bundler/setup'
+
+require 'ruote'
+require 'ruote/storage/fs_storage'
+require 'ruote/dashboard'
+require 'boss/boss_store'
+require 'boss/config'
+
+good=0
+
+if Process.uid == 0 then
+   puts "Can't run as root"
+   exit 0
+end
+
+$dashboard = Ruote::Dashboard.new(
+    # Use boss.config
+    BOSS.storage
+)
+
+loop do
+  processes = $dashboard.processes(:limit=>100, :skip=>good)
+  break if processes.length == 0
+  processes.each { |proc|
+#    puts "Consider #{proc.wfid} / #{proc.definition_name} from #{proc.position})"
+    if proc.definition_name == ARGV[0] or !ARGV[0]
+      this_proc=$dashboard.process(proc.wfid)
+      next unless this_proc
+#      puts "#{proc.wfid} was doing #{proc.position}"
+#      puts "#{proc.wfid} is #{this_proc.inspect}"
+#      puts "expressions #{this_proc.root_expression}"
+#      puts "wis #{this_proc.workitems}"
+      # this_proc.expressions.select { |fexp|
+      #   #fexp.is_a?(Ruote::Exp::ParticipantExpression)
+      #   fexp.h.name == 'participant'
+      # }.each {|fexp|
+      #   puts "reapply1 #{fexp}  #{fexp.fei}"
+      #   $dashboard.re_apply(fexp.fei, :fields => nil, :tree => nil, :state => nil, :breakpoint => false)
+      # }
+      this_proc.workitems.each {|wi|
+#        puts "reapply #{wi} with #{wi.fields} and #{this_proc.original_tree}"
+#       $dashboard.re_apply(wi, :fields => wi.fields, :tree => this_proc.original_tree)
+        puts "reapply #{wi} for #{wi.participant_name}"
+        $dashboard.re_apply(wi)
+        sleep(0.1)
+      }
+    end
+    good+=1
+  }
+  puts "looping"
+end
+
+
+#$dashboard.respark("20170425-1421-pisokasu-niwajuke")
+#$dashboard.re_apply('0_14_0!512836bacaa6900aaa01b204fdf6b787!20150604-1553-dukapade-hesayura')
+$dashboard.join
+exit 0
+#Reapply: fei => {"engine_id"=>"engine", "wfid"=>"20180511-0721-nuhokuba-dekagadi", "subid"=>"bfc3f08cd9d8bb977ad05f5b2b771c40", "expid"=>"0_0"} 're_apply' => {"state"=>nil, "breakpoint"=>false, "fields"=>nil, "tree"=>nil}
+#Reapply: fei => {"engine_id"=>"engine", "wfid"=>"20180511-0721-nuhokuba-dekagadi", "subid"=>"bfc3f08cd9d8bb977ad05f5b2b771c40", "expid"=>"0_0"} 're_apply' => {"fields"=>nil, "tree"=>nil}
