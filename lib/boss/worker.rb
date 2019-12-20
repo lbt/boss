@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
 
-require 'rubygems'
 require 'ruote'
 require 'pp'
 
-module Ruote
-  class BOSSWorker < Ruote::Worker
+# TODO: move the classes to a different file/module?
+module BOSS
+  class Worker < Ruote::Worker
 
     attr_reader :priority
     attr_reader :number
@@ -15,10 +15,8 @@ module Ruote
       @priority = options.fetch("priority", "high")
       @number = options.fetch("number", 0)
       @roles = options.fetch("roles", [])
-      name = options.fetch("name", "worker")
 
-      super(name, storage)
-      puts "BOSSWorker running with priority=#{@priority} and number=#{@number}"
+      super(storage)
 
     end
 
@@ -30,7 +28,7 @@ module Ruote
 
     def process_msgs
 
-      @msgs = @storage.get_msgs(100, @priority) if @msgs.empty?
+      @msgs = @storage.get_msgs(1, @priority) if @msgs.empty?
 
       while @msg = @msgs.pop
 

@@ -1,8 +1,12 @@
-require 'boss/boss_store'
-require 'boss/boss_viewer'
-require 'boss/boss_receiver'
-require 'boss/boss_registrar'
-require 'boss/boss_participant'
+require 'rubygems'
+require 'yajl'
+
+require 'boss/store'
+require 'boss/viewer'
+require 'boss/receiver'
+require 'boss/registrar'
+require 'boss/participant'
+require 'boss/worker'
 
 class Boss
   @connection
