@@ -1,27 +1,15 @@
-source "http://rubygems.org" do
+source "https://rubygems.org" do
   gem "rspec", :require => "spec" 
   gem "inifile"
   gem "yajl-ruby", ">=1.3.0"
+  gem "bunny"
 end
 # That's it for our strict dependencies. However, we also want to
 # ensure we're using specific git versions from things further down the tree.
-
 # To use local checkout: bundle config local.$GEMNAME /path/to/checkout
-
 # Specify refs to pin the git. Local checkouts will use the branch
 
-if ENV["USE_GIT"]
-  gem "boss", :git => "https://github.com/MeeGoIntegration/boss.git", :branch => "master"
-  gem "ruote", :git => "https://github.com/MeeGoIntegration/ruote.git", :branch => "mint-master", :ref => "86fe481a5"
-  gem "ruote-amqp", :git => "https://github.com/MeeGoIntegration/ruote-amqp.git", :branch => "master"
-  gem "ruote-kit", :git => "https://github.com/MeeGoIntegration/ruote-kit.git", :branch => "master"
-  gem "amqp", :git => "https://github.com/MeeGoIntegration/amqp.git", :branch => "mer-0.9.7"
-else
-  source "file:///srv/boss/boss/gemrepo/" do
-    gem "boss"
-    gem "ruote"
-    gem "ruote-amqp"
-    gem "ruote-kit"
-    gem "amqp"
-  end
-end
+gem "ruote", :git => "https://github.com/MeeGoIntegration/ruote.git", :ref => "30a6bb88"
+gem "ruote-kit", :git => "https://github.com/MeeGoIntegration/ruote-kit.git", :branch => "master"
+
+gemspec

@@ -8,11 +8,8 @@ require 'boss/registrar'
 require 'boss/participant'
 require 'boss/worker'
 
-class Boss
-  @connection
-
+module Boss
   class << self
     attr_accessor :connection  # provide class methods for reading/writing
   end
 end
-
